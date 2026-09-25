@@ -4,8 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from utils.exception_handlers import register_exception_handlers
 
 origins = [
-    "http://localhost:6008"
-    ]
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:6008",
+]
 
 app = FastAPI()
 
@@ -13,7 +15,7 @@ register_exception_handlers(app)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

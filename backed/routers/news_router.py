@@ -25,7 +25,9 @@ async def get_news_list(
     db: db.AsyncSession = Depends(db.get_database)
     ):
     skip = (page - 1) * page_size
-    news_list = await news_crud.get_news_list(skip=skip, limit=page_size, database=db)
+    news_list = await news_crud.get_news_list(
+        skip=skip, limit=page_size, category_id=category_id, database=db
+    )
     total = await news_crud.get_news_count(category_id=category_id, database=db)
 
     more = False
@@ -48,20 +50,24 @@ async def get_news_detail(
     db: db.AsyncSession = Depends(db.get_database)
     ):
     news_detail = await news_crud.get_news_detail(news_id=news_id, database=db)
-    relate_news = await news_crud.get_news_relate(news_id=news_id,category = news_detail.category_id, database=db)
-    news_views = await news_crud.add_views(news_id=news_id, database=db)
     if news_detail is None:
         return {
             "code": 404,
             "message": "新闻未找到",
             "data": None
         }
+
+    await news_crud.add_views(news_id=news_id, database=db)
+    news_detail.views += 1
+    relate_news = await news_crud.get_news_relate(
+        news_id=news_id, category=news_detail.category_id, database=db
+    )
     
     return {
     "code": 200,
     "message": "success",
     "data": {
-        "id": 1,
+        "id": news_detail.id,
         "title": news_detail.title,
         "content": news_detail.content,
         "image": news_detail.image,

@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException
 from config import db
 from models import users_model
 from crud import users_crud
@@ -34,4 +33,25 @@ async def info(user: users_model.User = Depends(auth.get_current_user)):
     """获取用户信息"""
     return success_response(
         message="success", data=UserInfoResponse.model_validate(user)
+    )
+
+@router.put("/update")
+async def update_user_info(user_data: users_schemas.UserUpdateRequest, user: users_model.User = Depends(auth.get_current_user), db: db.AsyncSession = Depends(db.get_database)):
+    """更新用户信息"""
+    updated_user = await users_crud.update_user_info(user.username, user_data, database=db)
+    return success_response(
+        message="用户信息更新成功", data=UserInfoResponse.model_validate(updated_user)
+    )
+
+@router.put("/password")
+async def update_password(password_data: users_schemas.PasswordUpdateRequest, user: users_model.User = Depends(auth.get_current_user), db: db.AsyncSession = Depends(db.get_database)):
+    """更新用户密码"""
+    updated_user = await users_crud.update_password(
+        user,
+        password_data.old_password,
+        password_data.new_password,
+        database=db,
+    )
+    return success_response(
+        message="用户密码修改成功", data=UserInfoResponse.model_validate(updated_user)
     )

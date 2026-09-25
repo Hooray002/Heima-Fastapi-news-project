@@ -1,10 +1,7 @@
-import traceback
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError,SQLAlchemyError
 from starlette import status
-
-DEBUG_MODE = True
 
 async def http_exception_handler(
     request: Request,
@@ -29,7 +26,12 @@ async def integrity_exception_handler(
     elif "FOREIGN KEY" in error_msg:
         detail="关联数据不存在"
     else:
-        detaiil="数据约束冲突，请检查输入"
+        detail="数据约束冲突，请检查输入"
+
+    return JSONResponse(
+        status_code=status.HTTP_409_CONFLICT,
+        content={"code": status.HTTP_409_CONFLICT, "message": detail, "data": None},
+    )
 
 async def sqlalchemy_error_handler(
         request: Request,
@@ -40,7 +42,7 @@ async def sqlalchemy_error_handler(
         content={
             "code":500,
             "message": "数据库操作失败，请稍候重试",
-            "date":None
+            "data": None
         }
     )
 

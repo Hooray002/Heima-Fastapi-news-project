@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import Depends
 from sqlalchemy import func, update
 from config import db
@@ -10,8 +12,21 @@ async def get_categories(skip: int = 0, limit: int = 100, database: AsyncSession
     categories = result.scalars().all()
     return categories
 
-async def get_news_list(skip: int = 0, limit: int = 100, database: AsyncSession = Depends(db.get_database)):
-    result = await database.execute(select(News).offset(skip).limit(limit))
+async def get_news_list(
+    skip: int = 0,
+    limit: int = 100,
+    category_id: Optional[int] = None,
+    database: AsyncSession = Depends(db.get_database),
+):
+    statement = select(News)
+    if category_id is not None:
+        statement = statement.where(News.category_id == category_id)
+    result = await database.execute(
+        statement
+        .order_by(News.publish_time.desc())
+        .offset(skip)
+        .limit(limit)
+    )
     news_list = result.scalars().all()
     return news_list
 
@@ -33,7 +48,7 @@ async def get_news_relate(news_id: int, category: int, database: AsyncSession = 
     news_relate = result.scalars().all()
     return news_relate
 
-async def add_views(news_id: int, database: AsyncSession = Depends(db.async_engine)):
+async def add_views(news_id: int, database: AsyncSession = Depends(db.get_database)):
     result = update(News).where(news_id == News.id).values(views = News.views + 1)
     await database.execute(result)
     await database.commit()

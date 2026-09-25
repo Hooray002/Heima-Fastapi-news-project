@@ -1,8 +1,7 @@
 from datetime import timedelta, datetime
 import uuid
-
-from fastapi import Depends
-from sqlalchemy import func, update
+from fastapi import Depends, HTTPException
+from sqlalchemy import update
 from config import db
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -61,4 +60,29 @@ async def getUserByToken(db: AsyncSession, token: str):
     stmt = select(User).where(User.id == userToken.user_id)
     result = await db.execute(stmt)
     user = result.scalars().one_or_none()
+    return user
+
+async def update_user_info(username: str, user_data: users_schemas.UserUpdateRequest, database: AsyncSession = Depends(db.get_database)):
+    query = update(User).where(User.username==username).values(**user_data.model_dump(exclude_unset=True,exclude_none=True))
+    result = await database.execute(query)
+    await database.commit()
+    if result.rowcount == 0:
+        raise HTTPException(status_code=404, detail="用户不存在")
+    update_user = await get_user_name(username, database)
+    return update_user
+
+async def update_password(
+    user: User,
+    old_password: str,
+    new_password: str,
+    database: AsyncSession = Depends(db.get_database),
+):
+    if not verify_password(old_password, user.password):
+        raise HTTPException(status_code=400, detail="旧密码错误")
+
+    hashed_password = get_hash_password(new_password)
+    user.password = hashed_password
+    database.add(user)
+    await database.commit()
+    await database.refresh(user)
     return user

@@ -14,7 +14,7 @@ async def get_current_user(
     """获取当前用户"""
     if not authorization:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="请先登录")
-    token = authorization.removeprefix("Bearer ").strip()
+    token = authorization.removeprefix("Bearer").strip()
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="请先登录")
     user = await users_crud.getUserByToken(db, token)

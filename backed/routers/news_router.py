@@ -31,7 +31,7 @@ async def get_news_list(
     total = await news_crud.get_news_count(category_id=category_id, database=db)
 
     more = False
-    if (skip+len(news_list)) < total:
+    if total is not None and (skip + len(news_list)) < total:
         more = True
 
     return {

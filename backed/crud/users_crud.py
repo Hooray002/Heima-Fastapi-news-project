@@ -82,7 +82,6 @@ async def update_password(
 
     hashed_password = get_hash_password(new_password)
     user.password = hashed_password
-    database.add(user)
     await database.commit()
     await database.refresh(user)
     return user

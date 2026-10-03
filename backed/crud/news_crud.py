@@ -49,6 +49,6 @@ async def get_news_relate(news_id: int, category: int, database: AsyncSession = 
     return news_relate
 
 async def add_views(news_id: int, database: AsyncSession = Depends(db.get_database)):
-    result = update(News).where(news_id == News.id).values(views = News.views + 1)
+    result = update(News).where(News.id == news_id).values(views = News.views + 1) 
     await database.execute(result)
     await database.commit()

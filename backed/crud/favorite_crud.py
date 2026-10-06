@@ -2,6 +2,7 @@ from typing import Optional
 
 from fastapi import Depends
 from sqlalchemy import delete, func, update
+from crud import history_crud
 from config import db
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select

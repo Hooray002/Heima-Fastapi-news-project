@@ -13,11 +13,11 @@ class NewsItemBase(BaseModel):
     description: str = Field(description="新闻描述")
     image: str = Field(description="新闻图片")
     author: str = Field(description="新闻作者")
-    publish_time: datetime = Field(description="新闻发布时间时间")
-    category_id: int = Field(description="新闻分类ID")
+    publish_time: datetime = Field(description="新闻发布时间时间", alias="publishTime")
+    category_id: int = Field(description="新闻分类ID", alias="categoryId")
     views: int = Field(description="新闻浏览量")
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 class FavoriteRequest(BaseModel):
     news_id: int = Field(..., alias="newsId", description="新闻ID")
@@ -32,7 +32,7 @@ class FavoriteNewsItemResponse(NewsItemBase):
     收藏新闻响应模型
     """
 
-    favorite_time: datetime = Field(description="收藏时间")
+    favorite_time: datetime = Field(description="收藏时间", alias="favoriteTime")
 
 
 class FavoriteNewsListResponse(BaseModel):

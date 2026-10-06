@@ -7,4 +7,4 @@ def success_response(message: str = "success", data = None):
         "message" : message,
         "data" : data
     }
-    return JSONResponse(content=jsonable_encoder(content))
+    return JSONResponse(content=jsonable_encoder(content, by_alias=True))

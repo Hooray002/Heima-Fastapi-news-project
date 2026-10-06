@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import DateTime, Index, Integer, String, Text
+from sqlalchemy import DateTime, Index, Integer, String, Text, func
 
 from .base import Base
 from sqlalchemy.orm import Mapped, mapped_column
@@ -11,6 +11,7 @@ class Category(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, comment='新闻分类id')
     name: Mapped[str] = mapped_column(String(50), comment='新闻分类名称')
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, comment='新闻分类排序')
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), comment='创建时间')
 
 class News(Base):
     __tablename__ = 'news'
@@ -29,3 +30,4 @@ class News(Base):
     category_id: Mapped[int] = mapped_column(Integer, comment='新闻分类id')
     views: Mapped[int] = mapped_column(Integer, default=0, comment='新闻浏览量')
     publish_time: Mapped[datetime] = mapped_column(DateTime, comment='新闻发布时间')
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), comment='创建时间')

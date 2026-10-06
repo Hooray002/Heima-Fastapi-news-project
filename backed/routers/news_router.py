@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from config import db
 from models import news_model
-from crud import news_crud
+from crud import news_crud, history_crud
 
 #创建API_Router实例，设置路由前缀和标签
 router = APIRouter(prefix="/api/news",tags=["news"])
